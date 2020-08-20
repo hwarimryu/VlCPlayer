@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAccelerationError, IVideoPlayer {
+    final static String TAG="CctvPlayer";
+
     private int mVideoWidth;
     private int mVideoHeight;
     private LibVLC libvlc;
@@ -30,6 +32,7 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
     private SurfaceHolder surfaceHolder;
 
     public CctvPlayer(SurfaceView surfaceView, String url, Context context) {
+
         libvlc = new LibVLC(CctvPlayer.this.getRtspOptions(CctvPlayer.this.parseUrl(url)));
         this.surfaceView = surfaceView;
         this.surfaceHolder = surfaceView.getHolder();
@@ -39,18 +42,17 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
     }
 
     public void start() {
-//        surfaceView= new SurfaceView(context);
-//        surfaceView.setVisibility(View.VISIBLE);
+
         CctvHandlerThread.getInstance().getHandler().post(new Runnable() {
             @Override
             public void run() {
                 surfaceHolder = surfaceView.getHolder();
-                Log.i("cctyplayer", "run");
+                Log.i(TAG, "run");
 
 
                 try {
                     Map<String, String> urlInfo = CctvPlayer.this.parseUrl(url);
-                    Log.i("cctyplayer", CctvPlayer.this.getRtspOptions(CctvPlayer.this.parseUrl(url)).toString());
+                    Log.i(TAG, CctvPlayer.this.getRtspOptions(CctvPlayer.this.parseUrl(url)).toString());
 
 
 
@@ -67,7 +69,7 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
                     mediaPlayer.play();
 
                 } catch (Exception e) {
-                    Log.e("VLC", "Error creating player: " + e.getMessage());
+                    Log.e(TAG, "Error creating player: " + e.getMessage());
                 }
             }
         });
@@ -90,7 +92,7 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
 
                 surfaceHolder = null;
                 libvlc.release();
-                libvlc = null;
+//                libvlc = null;
 
                 mVideoWidth = 0;
                 mVideoHeight = 0;
@@ -99,15 +101,17 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
     }
 
     private void setSize(int width, int height) {
+        Log.i(TAG, "set size");
+
         mVideoWidth = width;
         mVideoHeight = height;
         if (mVideoWidth * mVideoHeight <= 1)
             return;
 
         if (surfaceHolder == null || surfaceView == null){
-            Log.i("cctvplayer. setsize", "null");
+            Log.i(TAG, "set size null");
             return;
-}
+        }
 
         int w = mVideoWidth;
         int h = mVideoHeight;
@@ -123,7 +127,7 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
 
     @Override
     public void onNewLayout(IVLCVout vlcVout, int width, int height, int visibleWidth, int visibleHeight, int sarNum, int sarDen) {
-        Log.d("Property.TAG", "on new layout");
+        Log.d(TAG, "on new layout");
         if (width * height == 0) return;
 
         setSize(mVideoWidth, mVideoHeight);
@@ -132,13 +136,13 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
 
     @Override
     public void onSurfacesCreated(IVLCVout vlcVout) {
-        Log.d("Property.TAG", "cctv player surfaces created");
+        Log.d(TAG, "cctv player surfaces created");
 
     }
 
     @Override
     public void onSurfacesDestroyed(IVLCVout vlcVout) {
-        Log.d("Property.TAG", "cctv player surfaces destroyed");
+        Log.d(TAG, "cctv player surfaces destroyed");
     }
 
     @Override
@@ -153,7 +157,7 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
 
     @Override
     public void eventHardwareAccelerationError() {
-        Log.e("Property.TAG", "Error with hardware acceleration");
+        Log.e(TAG, "Error with hardware acceleration");
     }
 
     private Map<String, String> parseUrl(String url) {
@@ -181,14 +185,14 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
     }
 
     private ArrayList<String> getRtspOptions(Map<String, String> urlInfo) {
-        ArrayList<String> options = new ArrayList<>();
-//        options.add("--aout=opensles");
-//        options.add("-vvv");
+        ArrayList<String> args = new ArrayList<>();
+        args.add("--aout=opensles");
+        args.add("-vvv");
 
-        if (urlInfo.containsKey("id")) options.add("--rtsp-user=" + urlInfo.get("id"));
-        if (urlInfo.containsKey("pwd")) options.add("--rtsp-pwd=" + urlInfo.get("pwd"));
+        if (urlInfo.containsKey("id")) args.add("--rtsp-user=" + urlInfo.get("id"));
+        if (urlInfo.containsKey("pwd")) args.add("--rtsp-pwd=" + urlInfo.get("pwd"));
 
-        return options;
+        return args;
     }
 
     private String getRtspUrl(Map<String, String> urlInfo) {
