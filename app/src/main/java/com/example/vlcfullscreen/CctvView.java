@@ -2,51 +2,36 @@ package com.example.vlcfullscreen;
 
 import android.content.Context;
 import android.graphics.Color;
-//import android.support.annotation.Nullable;
-//import android.support.v4.content.ContextCompat;
-import android.text.Layout;
+
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import androidx.appcompat.app.ActionBar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import org.jetbrains.annotations.Nullable;
 
-public class CctvView extends LinearLayout {
+public class CctvView extends FrameLayout {
+    final static String TAG="CctvView";
 
     private Context context;
-    private float scaleFactor;
-    private int height;
 
     private String cctvId;
 
+    private TextView cctvID;
     private String url;
 
     private CctvPlayer cctvPlayer;
     private SurfaceView surfaceView;
 
-    private final int CCTV_FULLSCREEN = 0;
-    private final int CCTV_LOC_TOP_LEFT = 1;
-    private final int CCTV_LOC_TOP_RIGHT = 2;
-    private final int CCTV_LOC_BOTTOM_LEFT = 3;
-    private final int CCTV_LOC_BOTTOM_RIGHT = 4;
 
-    public CctvView(Context context,String url) {
+    public CctvView(Context context, String url,String cctvId) {
         super(context);
         this.context = context;
         this.url = url;
-//        setLayout(location);
-        setLayout();
-
         this.cctvId = cctvId;
+        setLayout();
     }
 
     public CctvView(Context context, @Nullable AttributeSet attrs) {
@@ -57,39 +42,40 @@ public class CctvView extends LinearLayout {
         super(context, attrs, defStyleAttr);
     }
 
-
     private void setLayout() {
-        Log.i("CCTV_VIEW","setLayout");
-        setOrientation(VERTICAL);
-        surfaceView = new SurfaceView(context);
-        addView(surfaceView);
+        Log.i(TAG,"setLayout");
 
-        TextView cctvId = new TextView(context);
-        cctvId.setText("cctv Id");
-        cctvId.setTextSize(14);
-        cctvId.setTextColor(Color.BLUE);
-        cctvId.setBackgroundColor(Color.TRANSPARENT);
-        cctvId.setVisibility(VISIBLE);
-        cctvId.setHeight(20);
-//        cctvId.setGravity(Gravity.);
-        addView(cctvId);
+        surfaceView = new SurfaceView(context);
+
+        addView(surfaceView);
+        surfaceView.setZOrderOnTop(false);
+        setVisibility(VISIBLE);
+
+        cctvID = new TextView(context);
+        cctvID.setText(this.cctvId);
+        cctvID.setTextSize(20);
+        cctvID.setTextColor(Color.RED);
+        cctvID.setGravity(Gravity.CENTER_HORIZONTAL);
+        cctvID.setBackgroundColor(Color.TRANSPARENT);
+        cctvID.setVisibility(VISIBLE);
+
+        addView(cctvID);
         play();
     }
 
 
-    public void play() throws IllegalStateException {
+    public void play() {
 
         if (cctvPlayer != null) {
-            Log.i("CCTV VIEW","Already another CCTV is playing");
-
+            Log.i(TAG,"Already another CCTV is playing");
             cctvPlayer.stop();
         }
 
-
-//        String videoSrc ="rtsp://172.16.28.1:8553/live";
-
         cctvPlayer = new CctvPlayer(surfaceView, url,context);
         cctvPlayer.start();
+        Log.e(TAG,"play");
+
+
     }
 
     public void stop() {
@@ -97,14 +83,22 @@ public class CctvView extends LinearLayout {
 
         cctvPlayer.stop();
         cctvPlayer = null;
-
-//        cctvCallback.cctvViewStopped(cctvDevice);
-
         setVisibility(INVISIBLE);
     }
 
-    public void setOnClickListener() {
 
+    @Override
+    protected void onDetachedFromWindow() {
+        //레이아웃 remove 할 때 스트리밍 하던 거 꺼줘야함.
+        Log.i(TAG,"onDetachedFromWindow");
+        super.onDetachedFromWindow();
+        stop();
     }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getCctvId() {return cctvId;    }
 }
 

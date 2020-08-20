@@ -4,6 +4,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 
 public class CctvHandlerThread {
+    final static String TAG="CctvHandlerThread";
+
     private HandlerThread handlerThread;
     private Handler handler;
 
