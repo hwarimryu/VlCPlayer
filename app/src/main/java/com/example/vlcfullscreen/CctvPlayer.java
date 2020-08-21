@@ -37,7 +37,7 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
         this.surfaceView = surfaceView;
         this.surfaceHolder = surfaceView.getHolder();
         this.url = url;
-        this.context =context;
+//        this.context =context;
         System.out.println(url);
     }
 
@@ -92,7 +92,7 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
 
                 surfaceHolder = null;
                 libvlc.release();
-//                libvlc = null;
+                libvlc = null;
 
                 mVideoWidth = 0;
                 mVideoHeight = 0;
@@ -143,6 +143,7 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
     @Override
     public void onSurfacesDestroyed(IVLCVout vlcVout) {
         Log.d(TAG, "cctv player surfaces destroyed");
+        stop();
     }
 
     @Override

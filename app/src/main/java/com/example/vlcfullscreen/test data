@@ -1,0 +1,34 @@
+        this.cctvDatas[0]=new CctvData("놀이터1","rtsp://172.16.28.1:8552/live");
+        this.cctvDatas[1]=new CctvData("놀이터 정문","rtsp://172.16.28.1:8553/live");
+        this.cctvDatas[2]=new CctvData("놀이터 후문","rtsp://172.16.28.1:8554/live");
+        this.cctvDatas[3]=new CctvData("놀이터2","rtsp://172.16.28.1:8555/live");
+
+
+sos test!!
+cmd에서 req
+curl -d "{devices:[{\"url\":\"rtsp://172.16.28.1:8552/live\",\"cctvId\":\"exit1\"},{\"url\":\"rtsp://172.16.28.1:8553/live\",\"cctvId\":\"exit2\"},{\"url\":\"rtsp://172.16.28.1:8554/live\",\"cctvId\":\"exit3\"},{\"url\":\"rtsp://172.16.28.1:8555/live\",\"cctvId\":\"exit4\"}],\"sosCctvId\":\"exit1\"}" http://172.16.100.18:8080/sos
+
+fullscreen test!!
+        http://172.16.100.18:8080/fullscreen?url=172.16.18.1:8552&cctvid=exit1
+
+        adb아니고 AVD에서 주소 모를 때
+
+//    public String getLocalIpAddress() {
+//        try {
+//            for (Enumeration<NetworkInterface> en = NetworkInterface
+//                    .getNetworkInterfaces(); en.hasMoreElements();) {
+//                NetworkInterface intf = en.nextElement();
+//                for (Enumeration<InetAddress> enumIpAddr = intf
+//                        .getInetAddresses(); enumIpAddr.hasMoreElements();) {
+//                    InetAddress inetAddress = enumIpAddr.nextElement();
+//                    if(!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+//                        String ipAddr = inetAddress.getHostAddress();
+//                        return ipAddr;
+//                    }
+//                }
+//            }
+//        } catch (SocketException ex) {
+//            Log.d("TAG", ex.toString());
+//        }
+//        return null;
+//    }
