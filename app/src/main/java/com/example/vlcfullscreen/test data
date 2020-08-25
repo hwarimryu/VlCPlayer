@@ -2,14 +2,16 @@
         this.cctvDatas[1]=new CctvData("놀이터 정문","rtsp://172.16.28.1:8553/live");
         this.cctvDatas[2]=new CctvData("놀이터 후문","rtsp://172.16.28.1:8554/live");
         this.cctvDatas[3]=new CctvData("놀이터2","rtsp://172.16.28.1:8555/live");
-
+curl -d "{devices:[{\"url\":\"rtsp://172.16.28.1:8552/live\",\"cctvTitle\":\"exit1\",\"id\":\"exit1\",\"pwd\":\"exit1\"}]}" http://172.16.100.18:8080/
 
 sos test!!
 cmd에서 req
 curl -d "{devices:[{\"url\":\"rtsp://172.16.28.1:8552/live\",\"cctvId\":\"exit1\"},{\"url\":\"rtsp://172.16.28.1:8553/live\",\"cctvId\":\"exit2\"},{\"url\":\"rtsp://172.16.28.1:8554/live\",\"cctvId\":\"exit3\"},{\"url\":\"rtsp://172.16.28.1:8555/live\",\"cctvId\":\"exit4\"}],\"sosCctvId\":\"exit1\"}" http://172.16.100.18:8080/sos
 
+curl -d {devices:[{\"url\":\"rtsp://172.16.28.1:8552/live\",\"cctvTitle\":\"exit1\",\"id\":\"exit1\",\"pwd\":\"exit1\"},{\"url\":\"rtsp://172.16.28.1:8553/live\",\"cctvTitle\":\"exit2\",\"id\":\"exit2\",\"pwd\":\"exit2\"},{\"url\":\"rtsp://172.16.28.1:8554/live\",\"cctvTitle\":\"exit3\",\"id\":\"exit3\",\"pwd\":\"exit3\"},{\"url\":\"rtsp://172.16.28.1:8555/live\",\"cctvTitle\":\"exit4\",\"id\":\"exit4\",\"pwd\":\"exit4\"}]} http://172.16.100.18:8080
+
 fullscreen test!!
-        http://172.16.100.18:8080/fullscreen?url=172.16.18.1:8552&cctvid=exit1
+       http://172.16.100.18:8080/fullscreen?url=rtsp://172.16.28.1:8554&cctvid=exit3
 
         adb아니고 AVD에서 주소 모를 때
 

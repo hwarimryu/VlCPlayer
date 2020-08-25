@@ -1,5 +1,4 @@
-package com.example.vlcfullscreen;
-import java.io.IOException;
+package com.example.vlcfullscreen.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -13,24 +12,35 @@ import android.view.ViewGroup;
 import android.view.ViewManager;
 import android.widget.LinearLayout;
 
-import fi.iki.elonen.NanoHTTPD;
+import com.example.vlcfullscreen.cctv.CctvData;
+import com.example.vlcfullscreen.cctv.CctvServer;
+import com.example.vlcfullscreen.cctv.CctvView;
+import com.example.vlcfullscreen.LayoutManager;
+import com.example.vlcfullscreen.PrefsManager;
+import com.example.vlcfullscreen.R;
 
-public class CctvActivity extends AppCompatActivity implements NanoHTTPD.AsyncRunner {
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjection;
+
+
+public class CctvActivity extends AppCompatActivity  {
+    @Inject
+    PrefsManager prefsManager;
+    @Inject
+    LayoutManager layoutManager;
+
+
     final static String TAG="CctvActivity";
-    final static int FULLSCREEN=1;
-    final static int SOS=2;
-
-
 
     //  multiscreen 인가
-    private Boolean isFullScreen = true;
+    private Boolean isFullScreen = false;
 
     //fullscreen인 경우에 사용
     private CctvView cctvView_full;
-    private String url_full="rtsp://172.16.28.1:8554/live";
-    private String cctvId_full="";
+    private CctvData cctvData_full;
 
-//    multiscreen인 경우에 사용
+    //multiscreen인 경우에 사용
     private CctvData[] cctvDatas = new CctvData[4];
     private CctvView cctvView_leftTop, cctvView_rightTop, cctvView_leftBottom, cctvView_rightBottom;
 
@@ -48,75 +58,70 @@ public class CctvActivity extends AppCompatActivity implements NanoHTTPD.AsyncRu
                 vm.removeView(cctvView_full);
             }else{
                 isFullScreen=true;
-                url_full = ((CctvView)view).getUrl();
-                cctvId_full = ((CctvView)view).getCctvId();
-                Log.i(TAG,url_full);
+                cctvData_full=((CctvView)view).getCctvData();
+//                Log.i(TAG,url_full);
 
                 vm.removeView(cctvView_leftTop);
                 vm.removeView(cctvView_rightTop);
                 vm.removeView(cctvView_leftBottom);
                 vm.removeView(cctvView_rightBottom);
             }
+
+//
+//            Intent intent = new Intent(view.getContext(), CctvActivity.class);
+//            startActivity(intent);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
             setScreenLayout();
         }
     };
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
     private ConstraintLayout cctvLayout ;
 
-    static CctvServer cctvServer;
+    private CctvServer cctvServer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cctv);
         cctvLayout= findViewById( R.id.cctv_layout);
-        if(cctvServer==null){
-        try {
-            cctvServer = new CctvServer(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }}
-//      새로 생성될 때만 받은 data를 가져온다.
-        receivedCctvData();
+        cctvServer = CctvServer.getInstance();
+
+
+        isFullScreen = prefsManager.getString("SCREENTYPE").equals("FULL")|| layoutManager.getBoolean("ISFULL");
+
+        //      새로 생성될 때만 받은 data를 가져온다.
+
+        receiveCctvData();
     }
-    private void receivedCctvData() {
-        isFullScreen = cctvServer.getIsFullscreen();
-//        받은 data가 없으면 제일 처음 로딩 된 경우임
-        if(isFullScreen==null)  initCctvData();
+    private void receiveCctvData() {
+
+        if(isFullScreen)
+            cctvData_full = cctvServer.getCctvDataFull();
         else {
             cctvDatas = cctvServer.getCctvDatas();
-            cctvId_full = cctvServer.getCctvId_full();
-            url_full= cctvServer.getUrl_full();
         }
     }
-
-    private void initCctvData() {
-//        처음 앱 시작할 때 일단 전체화면으로 시작
-        isFullScreen=false;
-        cctvId_full = "onCreate";
-        url_full= "rtsp://172.16.28.1:8554/live";
-        cctvDatas[0]=new CctvData("놀이터1","rtsp://172.16.28.1:8552/live");
-        cctvDatas[1]=new CctvData("놀이터 정문","rtsp://172.16.28.1:8553/live");
-        cctvDatas[2]=new CctvData("놀이터 후문","rtsp://172.16.28.1:8554/live");
-        cctvDatas[3]=new CctvData("놀이터2","rtsp://172.16.28.1:8555/live");
-    }
+//
+//    private void initCctvData() {
+////        처음 앱 시작할 때 일단 전체화면으로 시작
+//        isFullScreen=false;
+//        cctvTitle_full = "onCreate";
+//        url_full= "rtsp://172.16.28.1:8554/live";
+//        cctvDatas[0]=new CctvData("놀이터1","rtsp://172.16.28.1:8552/live");
+//        cctvDatas[1]=new CctvData("놀이터 정문","rtsp://172.16.28.1:8553/live");
+//        cctvDatas[2]=new CctvData("놀이터 후문","rtsp://172.16.28.1:8554/live");
+//        cctvDatas[3]=new CctvData("놀이터2","rtsp://172.16.28.1:8555/live");
+//    }
 
     private void setScreenLayout(){
 
-
         if(isFullScreen){
             //fullscreen인 경우
-            cctvView_full = new CctvView(this,url_full,cctvId_full);
-//            cctvView_full.setZ
+            cctvView_full = new CctvView(this,cctvData_full);
             addContentView(cctvView_full,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
             cctvView_full.setOnClickListener(cctvViewClicked);
-        }else{
-            //multiscreen인 경우
-
+        }else{//multiscreen인 경우
 //          액션 바 height
             TypedValue tv = new TypedValue();
             getTheme().resolveAttribute(R.attr.actionBarSize, tv, true);
@@ -129,46 +134,41 @@ public class CctvActivity extends AppCompatActivity implements NanoHTTPD.AsyncRu
 
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width,height);
 
-            cctvView_leftTop = new CctvView(this,cctvDatas[0].url,cctvDatas[0].cctvId);
+            cctvView_leftTop = new CctvView(this,cctvDatas[0]);
             addContentView(cctvView_leftTop,layoutParams);
             cctvView_leftTop.setOnClickListener(cctvViewClicked);
 
-            cctvView_rightTop  = new CctvView(this,cctvDatas[1].url,cctvDatas[1].cctvId);
+            cctvView_rightTop  = new CctvView(this,cctvDatas[1]);
             layoutParams.setMargins(width,0,0,0);
             addContentView(cctvView_rightTop,layoutParams);
             cctvView_rightTop.setOnClickListener(cctvViewClicked);
 
-            cctvView_leftBottom  = new CctvView(this,cctvDatas[2].url,cctvDatas[2].cctvId);
+            cctvView_leftBottom  = new CctvView(this,cctvDatas[2]);
             layoutParams.setMargins(0,height,0,0);
             addContentView(cctvView_leftBottom,layoutParams);
             cctvView_leftBottom.setOnClickListener(cctvViewClicked);
 
-            cctvView_rightBottom = new CctvView(this,cctvDatas[3].url,cctvDatas[3].cctvId);
+            cctvView_rightBottom = new CctvView(this,cctvDatas[3]);
             layoutParams.setMargins(width,height,0,0);
             addContentView(cctvView_rightBottom,layoutParams);
             cctvView_rightBottom.setOnClickListener(cctvViewClicked);
-
         }
     }
     @Override
     protected void onResume() {
+        View decorView = getWindow().getDecorView();
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+        // Remember that you should never show the action bar if the
+        // status bar is hidden, so
+
         super.onResume();
         setScreenLayout();
     }
 
-
     @Override
-    public void closeAll() {
-        cctvServer.closeAllConnections();
-    }
-
-    @Override
-    public void closed(NanoHTTPD.ClientHandler clientHandler) {
-
-    }
-
-    @Override
-    public void exec(NanoHTTPD.ClientHandler code) {
-
+    protected void onStop() {
+        super.onStop();
     }
 }

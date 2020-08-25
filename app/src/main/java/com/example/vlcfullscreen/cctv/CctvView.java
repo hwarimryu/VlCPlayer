@@ -1,4 +1,4 @@
-package com.example.vlcfullscreen;
+package com.example.vlcfullscreen.cctv;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -16,21 +16,24 @@ public class CctvView extends FrameLayout {
     final static String TAG="CctvView";
 
     private Context context;
-
-    private String cctvId;
-
-    private TextView cctvID;
+    private CctvData cctvData;
+    private String title;
     private String url;
+    private boolean isCctiv;
+
+    private TextView title_textView;
 
     private CctvPlayer cctvPlayer;
     private SurfaceView surfaceView;
 
 
-    public CctvView(Context context, String url,String cctvId) {
+    public CctvView(Context context,CctvData cctvData) {
         super(context);
         this.context = context;
-        this.url = url;
-        this.cctvId = cctvId;
+        this.cctvData = cctvData;
+        this.isCctiv = cctvData.isCctv;
+        this.url = cctvData.url;
+        this.title = cctvData.cctvTitle;
         setLayout();
     }
 
@@ -45,21 +48,31 @@ public class CctvView extends FrameLayout {
     private void setLayout() {
         Log.i(TAG,"setLayout");
 
-        surfaceView = new SurfaceView(context);
+        if(!isCctiv){
+            title_textView = new TextView(context);
+            title_textView.setText("선택된 CCTV가 없습니다.");
+            title_textView.setTextSize(20);
+            title_textView.setTextColor(Color.WHITE);
+            title_textView.setGravity(Gravity.CENTER);
+            title_textView.setBackgroundColor(Color.TRANSPARENT);
+            title_textView.setVisibility(VISIBLE);
+            addView(title_textView);
+            return;
+        }
 
+
+        surfaceView = new SurfaceView(context);
         addView(surfaceView);
         surfaceView.setZOrderOnTop(false);
         setVisibility(VISIBLE);
-
-        cctvID = new TextView(context);
-        cctvID.setText(this.cctvId);
-        cctvID.setTextSize(20);
-        cctvID.setTextColor(Color.RED);
-        cctvID.setGravity(Gravity.CENTER_HORIZONTAL);
-        cctvID.setBackgroundColor(Color.TRANSPARENT);
-        cctvID.setVisibility(VISIBLE);
-
-        addView(cctvID);
+        title_textView = new TextView(context);
+        title_textView.setText(this.title);
+        title_textView.setTextSize(20);
+        title_textView.setTextColor(Color.RED);
+        title_textView.setGravity(Gravity.CENTER_HORIZONTAL);
+        title_textView.setBackgroundColor(Color.TRANSPARENT);
+        title_textView.setVisibility(VISIBLE);
+        addView(title_textView);
         play();
     }
 
@@ -90,6 +103,7 @@ public class CctvView extends FrameLayout {
     @Override
     protected void onDetachedFromWindow() {
         //레이아웃 remove 할 때 스트리밍 하던 거 꺼줘야함.
+
         Log.i(TAG,"onDetachedFromWindow");
         super.onDetachedFromWindow();
         stop();
@@ -99,6 +113,10 @@ public class CctvView extends FrameLayout {
         return url;
     }
 
-    public String getCctvId() {return cctvId;    }
+    public String getCctvId() {return title;    }
+
+    public CctvData getCctvData(){
+        return cctvData;
+    }
 }
 

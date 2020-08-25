@@ -1,4 +1,4 @@
-package com.example.vlcfullscreen;
+package com.example.vlcfullscreen.cctv;
 
 import android.content.Context;
 import android.net.Uri;
@@ -94,8 +94,8 @@ public class CctvPlayer implements IVLCVout.Callback, LibVLC.HardwareAcceleratio
                 libvlc.release();
                 libvlc = null;
 
-                mVideoWidth = 0;
-                mVideoHeight = 0;
+//                mVideoWidth = 0;
+//                mVideoHeight = 0;
             }
         });
     }

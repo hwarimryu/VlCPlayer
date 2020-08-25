@@ -8,8 +8,5 @@
         <attr name="metaButtonBarStyle" format="reference" />
         <attr name="metaButtonBarButtonStyle" format="reference" />
     </declare-styleable>
-    <declare-styleable name="CctvView3">
-        <attr name="cctvId" format="string"/>
-        <attr name="url" format="string"/>
-    </declare-styleable>
+
 </resources>
