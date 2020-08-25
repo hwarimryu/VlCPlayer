@@ -1,4 +1,4 @@
-package com.example.vlcfullscreen;
+package com.example.vlcfullscreen.cctv;
 
 import android.os.Handler;
 import android.os.HandlerThread;

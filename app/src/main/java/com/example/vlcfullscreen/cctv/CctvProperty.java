@@ -1,4 +1,4 @@
-package com.example.vlcfullscreen;
+package com.example.vlcfullscreen.cctv;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +26,6 @@ public class CctvProperty {
             for (int i = 0; i < capsArray.length(); i++) {
                 caps.add(capsArray.optString(i));
             }
-
         }
     }
 }
